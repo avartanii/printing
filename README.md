@@ -1,9 +1,10 @@
 # Homework 3
 ## 5 April 2016
 
-1. KirkmanSolver.java
-	```java
-	import java.util.Arrays;
+1. KirkmanSolver
+
+```java
+import java.util.Arrays;
 import java.util.ArrayList;
 
 public class KirkmanSolver {
