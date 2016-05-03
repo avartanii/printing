@@ -319,46 +319,46 @@
 	```java
 	import java.util.Arrays;
 
-public class Changer extends SubsetSum {
-
-	private int[] coins;
+	public class Changer extends SubsetSum {
 	
-	public Changer(int[] denominations) {
-		this.coins = denominations;
-	}
-
-	public int[] can_make_change_for(int amount) {
-		int[] moreCoins = this.coins;
-		while (sum(moreCoins) < this.coins.length * amount) {
-			moreCoins = concat(moreCoins, this.coins);
+		private int[] coins;
+	
+		public Changer(int[] denominations) {
+			this.coins = denominations;
 		}
-		return findSubset(moreCoins, amount);
-	}
 
-	public int[] can_make_change_using_each_coin_once(int amount) {
-		return findSubset(this.coins, amount);
-	}
+		public int[] can_make_change_for(int amount) {
+			int[] moreCoins = this.coins;
+			while (sum(moreCoins) < this.coins.length * amount) {
+				moreCoins = concat(moreCoins, this.coins);
+			}
+			return findSubset(moreCoins, amount);
+		}
 
-	public int[] can_make_change_with_limited_coins(int amount, int maxCoins) {
-		int[] moreCoins = this.coins;
-		while (sum(moreCoins) < this.coins.length * amount) {
-			moreCoins = concat(moreCoins, this.coins);
+		public int[] can_make_change_using_each_coin_once(int amount) {
+			return findSubset(this.coins, amount);
 		}
-		int[] change = findSubset(moreCoins, amount);
-		while (change.length > maxCoins) {
-			moreCoins = Arrays.copyOf(moreCoins, moreCoins.length - 1);
-			change = findSubset(moreCoins, amount);
-		}
-		return change.length <= maxCoins ? change : new int[0];
-	}
 
-	public static void main(String[] args) {
-		int[] coins = new int[args.length - 1];
-		int amount = Integer.parseInt(args[args.length - 1]);
-		for (int i = 0; i < coins.length; i++) {
-			coins[i] = Integer.parseInt(args[i]);
+		public int[] can_make_change_with_limited_coins(int amount, int maxCoins) {
+			int[] moreCoins = this.coins;
+			while (sum(moreCoins) < this.coins.length * amount) {
+				moreCoins = concat(moreCoins, this.coins);
+			}
+			int[] change = findSubset(moreCoins, amount);
+			while (change.length > maxCoins) {
+				moreCoins = Arrays.copyOf(moreCoins, moreCoins.length - 1);
+				change = findSubset(moreCoins, amount);
+			}
+			return change.length <= maxCoins ? change : new int[0];
 		}
-		Changer change = new Changer(coins);
+
+		public static void main(String[] args) {
+			int[] coins = new int[args.length - 1];
+			int amount = Integer.parseInt(args[args.length - 1]);
+			for (int i = 0; i < coins.length; i++) {
+				coins[i] = Integer.parseInt(args[i]);
+			}
+			Changer change = new Changer(coins);
+		}
 	}
-}
-```
+	```
