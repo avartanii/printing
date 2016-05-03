@@ -1,431 +1,430 @@
-# Homework 3
-## 5 April 2016
+# Homework 4
+## 3 May 2016
 
-1. KirkmanSolver
+1. Problem 1
+	```java
+	import java.util.HashSet;
+  import java.util.HashMap;
+  import java.util.ArrayList;
+  import java.util.Arrays;
+  import java.util.LinkedList;
 
+  public class PouringWater {
+
+	  private static HashSet<Node> usedNodes = new HashSet<Node>();
+	  private static final int TEN_CAPACITY = 10;
+	  private static final int SEVEN_CAPACITY = 7;
+	  private static final int FOUR_CAPACITY = 4;
+	  private static final int NUMBER_OF_POSSIBLE_CHILDREN = 12;
+	  private static final int TOTAL_AMOUNT = 11;
+
+	  static class Node {
+
+  		private Node[] children;
+		  private int tenAmount;
+		  private int sevenAmount;
+		  private int fourAmount;
+		  ArrayList<String> stepsTaken;
+
+		  public Node(int ten, int seven, int four) {
+  			this.tenAmount = ten;
+			  this.sevenAmount = seven;
+			  this.fourAmount = four;
+			  this.stepsTaken = new ArrayList<String>();
+			  this.children = new Node[NUMBER_OF_POSSIBLE_CHILDREN];
+		  }
+
+		  public Node(int ten, int seven, int four, ArrayList<String> stepsSoFar) {
+  			this.tenAmount = ten;
+			  this.sevenAmount = seven;
+			  this.fourAmount = four;
+			  this.stepsTaken = new ArrayList<String>(stepsSoFar);
+			  this.children = new Node[NUMBER_OF_POSSIBLE_CHILDREN];
+		  }
+
+		  public int getTenAmount() {
+  			return this.tenAmount;
+		  }
+
+		  public int getSevenAmount() {
+  			return this.sevenAmount;
+		  }
+
+		  public int getFourAmount() {
+  			return this.fourAmount;
+		  }
+
+		  public Node[] getChildren() {
+  			return this.children;
+	  	}
+
+		  public void addStep(String step) {
+  			this.stepsTaken.add(step);
+		  }
+
+  		public ArrayList<String> getStepsTaken() {
+			  return this.stepsTaken;
+		  }
+
+		  public void createChildren() {
+			  Node temp;
+
+  			int roomInTen = TEN_CAPACITY - this.tenAmount;
+			  int roomInSeven = SEVEN_CAPACITY - this.sevenAmount;
+			  int roomInFour = FOUR_CAPACITY - this.fourAmount;
+			  int newTen = 0;
+			  int newSeven = 0;
+			  int newFour = 0;
+			  String step = "";
+			  for (int i = 0; i < NUMBER_OF_POSSIBLE_CHILDREN; i++) {
+  				switch (i) {
+	  				case 0: newTen = this.tenAmount - roomInSeven > 0 ? this.tenAmount - roomInSeven : 0;
+							  newSeven = this.sevenAmount + this.tenAmount - newTen;
+							  newFour = this.fourAmount;
+							  step = "T: (10, 7)";
+							  break;
+					  case 1: newTen = this.tenAmount - roomInFour > 0 ? this.tenAmount - roomInFour : 0;
+							  newSeven = this.sevenAmount;
+							  newFour = this.fourAmount + this.tenAmount - newTen;
+							  step = "T: (10, 4)";
+							  break;
+					  case 2: newSeven = this.sevenAmount - roomInTen > 0 ? this.sevenAmount - roomInTen : 0;
+							  newTen = this.tenAmount + this.sevenAmount - newSeven;
+							  newFour = this.fourAmount;
+							  step = "T: (7, 10)";
+							  break;
+					  case 3: newSeven = this.sevenAmount - roomInFour > 0 ? this.sevenAmount - roomInFour : 0;
+							  newTen = this.tenAmount;
+							  newFour = this.fourAmount + this.sevenAmount - newSeven;
+							  step = "T: (7, 4)";
+							  break;
+					  case 4: newFour = this.fourAmount - roomInTen > 0 ? this.fourAmount - roomInTen : 0;
+							  newTen = this.tenAmount + this.fourAmount - newFour;
+							  newSeven = this.sevenAmount;
+							  step = "T: (4, 10)";
+							  break;
+					  case 5: newFour = this.fourAmount - roomInSeven > 0 ? this.fourAmount - roomInSeven : 0;
+							  newTen = this.tenAmount;
+							  newSeven = this.sevenAmount + this.fourAmount - newFour;
+							  step = "T: (4, 7)";
+							  break;
+					  case 6: newTen = 0;
+							  step = "E: (10)";
+					  case 7: newSeven = 0;
+						  	step = "E: (7)";
+					  case 8: newFour = 0;
+							  step = "E: (4)";
+					  case 9: newTen = 10;
+							  step = "F: (10)";
+					  case 10:newSeven = 7;
+						  	step = "F: (7)";
+					  case 11:newFour = 4;
+							  step = "F: (4)";
+				  }
+				  temp = new Node(newTen, newSeven, newFour, this.stepsTaken);
+				  temp.addStep(step);
+				  if (!usedNodes.contains(temp)) {
+  					usedNodes.add(temp);
+					  this.children[i] = temp;
+				  }
+			  }
+		  }
+
+		  public String toString() {
+  			return "(" + this.tenAmount + ", " + this.sevenAmount + ", " + this.fourAmount + ")";
+	  	}
+
+		  public int hashCode() {
+  			final int prime = 11;
+			  int result = 1;
+			  result = prime * result + this.tenAmount;
+			  result = prime * result + this.sevenAmount;
+			  result = prime * result + this.fourAmount;
+			  return result;
+		  }
+
+		  public boolean equals(Object obj) {
+  			if (obj instanceof Node) {
+				  Node n = (Node) obj;
+				  return this.tenAmount == n.getTenAmount() && this.sevenAmount == n.getSevenAmount() && this.fourAmount == n.getFourAmount();
+			  }
+			  return false;
+		  }
+	  }
+
+  	public static String pour() {
+		  Node firstNode = new Node(0, 7, 4);
+		  Node currentNode = firstNode;
+		  LinkedList<Node> backtrackNodes = new LinkedList<Node>();
+		  boolean found = false;
+		  usedNodes.add(firstNode);
+		  backtrackNodes.add(firstNode);
+
+  		while (!found) {
+			  currentNode = backtrackNodes.poll();
+			  currentNode.createChildren();
+			  for (int i = 0; i < NUMBER_OF_POSSIBLE_CHILDREN; i++) {
+  				if (currentNode.children[i] != null) {
+	  				if (currentNode.children[i].getSevenAmount() == 2 || currentNode.children[i].getFourAmount() == 2) {
+		  				currentNode = currentNode.children[i];
+			  			found = true;
+				  	} else {
+						  backtrackNodes.add(currentNode.children[i]);
+					  }
+				  }
+			  }
+		  }
+		  return Arrays.toString(currentNode.getStepsTaken().toArray());
+	  }
+
+	  public static void main(String[] args) {
+  		System.out.println(pour());
+  	}
+  }
+  ```
+
+2. Problem 2
+  a)
+
+  +------+------+------+
+  
+  | A: 0 | C: ∞ | D: ∞ |
+  
+  | B: 1 | G: ∞ | H: ∞ |
+  
+  | E: 4 |      |      |
+  
+  | F: 8 |      |      |
+  
+  +------+------+------+
+  
+  +--------------------+
+  
+  | A: 0 | C: 3 | D: ∞ |
+  
+  | B: 1 | G: 7 | H: ∞ |
+  
+  | E: 4 |......|......|
+  
+  | F: 7 |......|......|
+  
+  +------+------+------+
+  
+  +------+------+------+
+  
+  | A: 0 | C: 3 | D: 4 |
+  
+  | B: 1 | G: 5 | H: ∞ |
+  
+  | E: 4 |......|......|
+  
+  | F: 7 |......|......|
+  
+  +------+------+------+
+  
+  +------+------+------+
+  
+  | A: 0 | C: 3 | D: 4 |
+  
+  | B: 1 | G: 5 | H: 6 |
+  
+  | E: 4 |......|......
+  
+  | F: 7 |......|......|
+  
+  +------+------+------+
+  
+  b)
+  
+  (A) ---1---> (B) ---2---> (C) ---1---> (D)
+  
+   |............|............|
+   
+   |............|............|
+   
+   4............6............2
+   
+   |............|............|
+   
+   V............V............V
+   
+  (E)..........(F)..........(G) ---1---> (H)
+  
+	
+3. Problem 3
+  a)
+
+  +------+------+------+------+------+------+------+------+------+------+
+  
+  | S: 0 | A: 7 | B:11 | C: 6 | D: 8 | E: 6 | F: 5 | G: 9 | H: 7 | I: 8 |
+  
+  +------+------+------+------+------+------+------+------+------+------+
+  
+  | S: 0 | A: 7 | B:11 | C: 5 | D: 7 | E: 6 | F: 4 | G: 8 | H: 7 | I: 8 |
+  
+  +------+------+------+------+------+------+------+------+------+------+
+  
+  | S: 0 | A: 7 | B:11 | C: 5 | D: 7 | E: 6 | F: 4 | G: 8 | H: 7 | I: 7 |
+  
+  +------+------+------+------+------+------+------+------+------+------+
+  
+  | S: 0 | A: 7 | B:11 | C: 5 | D: 7 | E: 6 | F: 4 | G: 8 | H: 7 | I: 7 |
+  
+  +------+------+------+------+------+------+------+------+------+------+
+  
+  *b)
+  
+      S
+      
+     / \
+     
+    A   E
+    
+   / \   \
+   
+  B   C   F
+  
+  |   |
+  
+  H   D
+  
+  |
+  
+  G
+  
+  |
+  
+  I
+
+4. Problem 4
+
+  *Apply Dijkstra's algorithm with an additional parameter (number of edges) and prioritize lower cost over shorter trip
+
+5. Problem 5
+
+   * Incomplete
+
+6. Problem 6
 	```java
 	import java.util.Arrays;
-	import java.util.ArrayList;
-	
-	public class KirkmanSolver {
-	
-		static class Girl {
-	
-			char name;
-			Girl[] adjacencies;
-			int totalNumberOfGirls;
-			int x;
-			Girl generic;
-	
-			public Girl(char n) {
-				this.name = n;
-				totalNumberOfGirls = 15;
-				this.x = 88;
-				this.adjacencies = new Girl[this.totalNumberOfGirls];
-				this.adjacencies[0] = this;
-				this.generic = new Girl();
-				Arrays.fill(this.adjacencies, this.generic);
+
+	public class SubsetSum {
+
+		public static int[] findSubset(int[] set, int sum) {
+			if (sum < 0) {
+				return new int[0];
 			}
+			Arrays.sort(set);
+			int firstVal = set.length > 0 ? set[set.length - 1] : 0;
 	
-			public Girl() {
-				this.name = (char) 88;
+			int[] addends;
+			int possibleAddends = 0;
+			for (int i = 0; i < set.length && set[i] <= sum; i++) {
+				possibleAddends += 1;
 			}
-	
-			public char getName() {
-				return this.name;
+
+			if (possibleAddends == 0) {return new int[0];}
+
+			addends = new int[possibleAddends];
+
+			for (int i = 0; i < possibleAddends; i++) {
+				addends[i] = set[i];
 			}
-	
-			public Girl[] getAdjacencies() {
-				return this.adjacencies;
+
+			int firstAddend = addends[addends.length - 1];
+
+			if (sum(addends) == sum) {
+				return addends;
+			} else if (set.length <= 1) {
+				return new int[0];
 			}
-	
-			public boolean isAdjacentTo(Girl g) {
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					if (this.adjacencies[i].equals(g)) {
-						return true;
-					}
-				}
-				return false;
-			}
-	
-			public boolean addAdjacency(Girl g) {
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					if (this.adjacencies[i].equals(this.generic)) {
-						this.adjacencies[i] = g;
-						return true;
-					}
-				}
-				return false;
-			}
-	
-			public boolean removeAdjacency(Girl g) {
-				if (this.isAdjacentTo(g)) {
-					try {
-						for (int i = 0; i < this.totalNumberOfGirls; i++) {
-							if (this.adjacencies[i].equals(g)) {
-								this.adjacencies[i] = this.generic;
-								if (i == this.totalNumberOfGirls) {return true;}
-							}
-						}
-					} catch (Exception e) {
-						return false;
-					}
-				}
-				return false;
-			}
-	
-			public String toString() {
-				return String.valueOf(this.name);
-			}
-	
-			public boolean equals(Girl g) {
-				try {
-					return this.name == g.getName() && Arrays.equals(this.adjacencies, g.getAdjacencies());
-				} catch (Exception e) {
-					return false;
-				}
-			}
-	
-		}
-	
-		static class Day {
-	
-			Girl[] order;
-			Girl generic;
-			int totalNumberOfGirls;
-			int numberOfGirls;
-	
-			public Day() {
-				this.totalNumberOfGirls = 15;
-				this.order = new Girl[totalNumberOfGirls];
-				this.generic = new Girl();
-				Arrays.fill(this.order, this.generic);
-				this.numberOfGirls = 0;
-			}
-	
-			public Day(Girl[] girls) {
-				this.totalNumberOfGirls = 15;
-				this.order = girls;
-				this.numberOfGirls = 15;
-			}
-	
-			public int hasNextPosition(Girl g, int startIndex) {
-				int size = this.numberOfGirls;
-				int beginAt;
-				Girl firstGirl;
-				Girl secondGirl;
-				Girl thirdGirl;
-				//if (!this.contains(g)) {
-				beginAt = this.contains(g) ? ((startIndex / 3) + 1) * 3 : 0;
-				for (int i = beginAt; i < this.order.length; i += 3) {
-					firstGirl = !this.order[i].equals(this.generic) ? this.order[i] : this.generic;
-					secondGirl = !this.order[i + 1].equals(this.generic) ? this.order[i + 1] : this.generic;
-					thirdGirl = !this.order[i + 2].equals(this.generic) ? this.order[i + 2] : this.generic;
-	
-					if (firstGirl.equals(this.generic)) {
-						return i;
-					} else if (secondGirl.equals(this.generic) && !firstGirl.isAdjacentTo(g)) {
-						return i + 1;
-					} else if (thirdGirl.equals(this.generic) && !firstGirl.isAdjacentTo(g) && !secondGirl.isAdjacentTo(g)) {
-						return i + 2;
-					}
-				}
-				//}
-				return 16;
-			}
-	
-			public boolean remove(Girl g) {
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					try {
-						if (this.order[i].equals(g)) {
-							if (i % 3 == 1) {
-								this.order[i].removeAdjacency(this.order[i - 1]);
-								this.order[i - 1].removeAdjacency(this.order[i]);
-							} else if (i % 3 == 2) {
-								this.order[i].removeAdjacency(this.order[i - 2]);
-								this.order[i - 2].removeAdjacency(this.order[i]);
-								this.order[i].removeAdjacency(this.order[i - 1]);
-								this.order[i - 1].removeAdjacency(this.order[i]);
-							}
-							this.order[i] = this.generic;
-							this.numberOfGirls -= 1;
-							return true;
-						}
-					} catch (Exception e) {
-						return false;
-					}
-				}
-				return false;
-			}
-	
-			public boolean contains(Girl g) {
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					try {
-						if (this.order[i].equals(g)) {
-							return true; 
-						}
-					} catch (Exception e) {
-						return false;
-					}
-				}
-				return false;
-			}
-	
-			public int indexOf(Girl g) {
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					try {
-						if (this.order[i].equals(g)) {
-							return i; 
-						}
-					} catch (Exception e) {
-						return 0;
-					}
-				}
-				return 0;
-			}
-	
-			public boolean toNextPosition(Girl g) {
-				int nextPosition = this.hasNextPosition(g, this.indexOf(g));
-				if (nextPosition < 16) {
-					this.remove(g);
-					this.order[nextPosition] = g;
-					if (nextPosition % 3 == 1) {
-						this.order[nextPosition].addAdjacency(this.order[nextPosition - 1]);
-						this.order[nextPosition - 1].addAdjacency(this.order[nextPosition]);
-					} else if (nextPosition % 3 == 2) {
-						this.order[nextPosition].addAdjacency(this.order[nextPosition - 2]);
-						this.order[nextPosition - 2].addAdjacency(this.order[nextPosition]);
-						this.order[nextPosition].addAdjacency(this.order[nextPosition - 1]);
-						this.order[nextPosition - 1].addAdjacency(this.order[nextPosition]);
-					}
-					return true;
-				}
-				return false;
-			}
-	
-			public void emptyDay() {
-				Arrays.fill(this.order, this.generic);
-			}
-	
-			public String toString() {
-				String output = "";
-				String currentElement;
-				for (int i = 0; i < this.totalNumberOfGirls; i++) {
-					//currentElement = this.order[i] == null ? "n" : this.order[i].toString();
-					output += i % 3 == 0 ? "|" : "";
-					output += this.order[i].toString();
-					output += i % 3 == 2 ? "|\n" : ", ";
-				}
-				return output;
+
+			int[] subtracted = findSubset(Arrays.copyOf(addends, addends.length - 1), sum - firstAddend);
+			int[] removed = findSubset(Arrays.copyOf(addends, addends.length - 1), sum);
+
+			if (sum(subtracted) + firstAddend == sum) {
+				int[] firstAddendArray = new int[]{firstAddend};
+				return concat(firstAddendArray, subtracted);
+			} else {
+				return removed;
 			}
 		}
-	
-		public static boolean isStuck(Day[] week, Girl g) {
-			int isStuck = 0;
-			for (int i = 1; i < week.length; i++) {
-				if (week[i].hasNextPosition(g, week[i].indexOf(g)) > 15) {
-					isStuck += 1;
-				}
+
+		public static int sum(int[] addends) {
+			int sum = 0;
+			for (int i = 0; i < addends.length; i++) {
+				sum += addends[i];
 			}
-			//System.out.println("isStuck: " + isStuck);
-			return isStuck == 6;
+			return sum;
 		}
-	
-		public static boolean invalidWeek(Day[] week, Girl g) {
-			int check = 0;
-			boolean contains = true;
-			for (int i = 0; i < 7 && contains; i++) {
-				check += week[i].hasNextPosition(g, week[i].indexOf(g));
-				contains = week[i].contains(g);
+
+		public static int[] concat(int[] a1, int[] a2) {
+			int[] combination = new int[a1.length + a2.length];
+			for (int i = 0; i < a1.length; i++) {
+				combination[i] = a1[i];
 			}
-			return check < (5 * 15) && contains;
+			for (int i = 0; i < a2.length; i++) {
+				combination[i + a1.length] = a2[i];
+			}
+			return combination;
 		}
-	
-		public static void printWeek(Day[] week) {
-			String[][] allStrings = new String[7][5];
-			String toPrint = "";
-			for (int i = 0; i < 7; i++) {
-				allStrings[i] = week[i].toString().split("\n");
-			}
-			for (int i = 0; i < 5; i++) {
-				for (int j = 0; j < 7; j++) {
-					toPrint += allStrings[j][i];
-				}
-				toPrint += "\n";
-			}
-			System.out.println(toPrint);
-		}
-	
-		public static void kirkman() {
-			int totalNumberOfGirls = 15;
-			int numberOfDays = 7;
-			int dayNumber = 0;
-			int previousGirl = 0;
-			int count = 0;
-			boolean visitedAllDays;
-			Girl[] initialSet = new Girl[totalNumberOfGirls];
-			Girl newGirl;
-			Girl currentGirl;
-			Day[] week = new Day[numberOfDays];
-			Day currentDay;
-	
-			for (int i = 0; i < totalNumberOfGirls; i++) {
-				newGirl = new Girl((char) (65 + i));
-				initialSet[i] = newGirl;
-			}
-	
-			for (int i = 0; i < numberOfDays; i++) {
-				week[i] = new Day();
-			}
-	
-			for (int i = 0; i < totalNumberOfGirls; i++) {
-	
-				currentGirl = initialSet[i];
-				dayNumber = i >= previousGirl ? 0 : dayNumber;
-				for (int j = dayNumber; j < numberOfDays; j++, count++) {
-					currentDay = week[j];
-					if (!currentDay.toNextPosition(currentGirl)) {
-	
-						currentDay.remove(currentGirl);
-						previousGirl = i;
-	
-						j -= j >= 2 ? 2 : 1;
-						if (j == 0 && week[1].hasNextPosition(currentGirl, week[1].indexOf(currentGirl)) > 15) {
-							week[0].remove(currentGirl);
-							week[1].remove(currentGirl);
-							previousGirl = i;
-							i -= i >= 2 ? 2 : 1;
-							j = numberOfDays;
-							dayNumber = 6;
-						}
-						
-					}
-				}
-			}
-			printWeek(week);
-			System.out.println("Count: " + count);
-		}
-	
+
 		public static void main(String[] args) {
-			kirkman();
-	
+			int[] set = new int[args.length - 1];
+			int sum = Integer.parseInt(args[args.length - 1]);
+			for (int i = 0; i < set.length; i++) {
+				set[i] = Integer.parseInt(args[i]);
+			}
+			int[] subset = findSubset(set, sum);
+			System.out.println(subset.length > 0 ? Arrays.toString(subset) : "No subset found");
 		}
 	}
-	```
+	```java
 
-2. BacktrackingEngine
-
+7. Problem 7
 	```java
 	import java.util.Arrays;
+
+public class Changer extends SubsetSum {
+
+	private int[] coins;
 	
-	public abstract class BacktrackingEngine {
-	
-		int solutionLength;
-		int[] stepOptions;
-		int[] solutions;
-	
-		public BacktrackingEngine(int length, int[] opts) {
-			this.solutionLength = length;
-			this.stepOptions = opts;
-			this.solutions = new int[0];
-		}
-	
-		public abstract boolean isValid(int[] current);
-	
-		public int[] run(int[] solns) {
-			this.solutions = new int[solns.length + 1];
-			for (int i = 0; i < solns.length; i++) {
-				this.solutions[i] = solns[i];
-			}
-			for (int i = 0; i < this.stepOptions.length; i++) {
-				this.solutions[this.solutions.length - 1] = this.stepOptions[i];
-				if (isValid(this.solutions)) {
-					if (this.solutions.length >= this.solutionLength) {
-						return this.solutions;
-					} else {
-						run(this.solutions);
-					}
-				}
-			}
-			if (this.solutions.length < this.solutionLength || !isValid(this.solutions)) {
-				this.solutions = Arrays.copyOfRange(this.solutions, 0, this.solutions.length - 1);
-			}
-			return this.solutions;
-		}
+	public Changer(int[] denominations) {
+		this.coins = denominations;
 	}
-	```
 
-3. QueensSolver
-
-	```java
-	import java.util.Arrays;
-	
-	public class QueensSolver extends BacktrackingEngine {
-	
-		public QueensSolver(int boardWidth, int[] boardLength) {
-			super(boardWidth, boardLength);
+	public int[] can_make_change_for(int amount) {
+		int[] moreCoins = this.coins;
+		while (sum(moreCoins) < this.coins.length * amount) {
+			moreCoins = concat(moreCoins, this.coins);
 		}
-	
-		public boolean isValid(int[] board) {
-			for (int i = 0; i < board.length; i++) {
-				for (int j = i + 1; j < board.length; j++) {
-					if (board[i] == board[j] || Math.abs(board[j] - board[i]) == Math.abs(j - i)) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-	
-		public static void main(String[] args) {
-			int solutionsLength = Integer.parseInt(args[0]);
-			int[] options = new int[solutionsLength];
-			for (int i = 0; i < options.length; i++) {
-				options[i] = i;
-			}
-			QueensSolver engine = new QueensSolver(solutionsLength, options);
-			int[] result = engine.run(new int[0]);
-			System.out.println("Result: " + Arrays.toString(result));
-		}
-	
-	
+		return findSubset(moreCoins, amount);
 	}
-	```
 
-4. NeasSolver
-
-	```java
-	import java.util.Arrays;
-	
-	public class NeasSolver extends BacktrackingEngine {
-	
-		public NeasSolver(int stringLength, int[] numberRange) {
-			super(stringLength, numberRange);
-		}
-	
-		public boolean isValid(int[] string) {
-			int[] subArray1;
-			int[] subArray2;
-			for (int i = 0; i < string.length / 2; i++) {
-				for (int j = 0; j < string.length - i - i - 1; j++) {
-					subArray1 = Arrays.copyOfRange(string, j, j + i + 1);
-					subArray2 = Arrays.copyOfRange(string, j + i + 1, j + i + i + 2);
-					if (Arrays.equals(subArray1, subArray2)) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-	
-		public static void main(String[] args) {
-			int solutionsLength = Integer.parseInt(args[0]);
-			int[] options = new int[]{0, 1, 2};
-			NeasSolver engine = new NeasSolver(solutionsLength, options);
-			int[] result = engine.run(new int[0]);
-			System.out.println("Result: " + Arrays.toString(result));
-		}
-	
-	
+	public int[] can_make_change_using_each_coin_once(int amount) {
+		return findSubset(this.coins, amount);
 	}
-	```
+
+	public int[] can_make_change_with_limited_coins(int amount, int maxCoins) {
+		int[] moreCoins = this.coins;
+		while (sum(moreCoins) < this.coins.length * amount) {
+			moreCoins = concat(moreCoins, this.coins);
+		}
+		int[] change = findSubset(moreCoins, amount);
+		while (change.length > maxCoins) {
+			moreCoins = Arrays.copyOf(moreCoins, moreCoins.length - 1);
+			change = findSubset(moreCoins, amount);
+		}
+		return change.length <= maxCoins ? change : new int[0];
+	}
+
+	public static void main(String[] args) {
+		int[] coins = new int[args.length - 1];
+		int amount = Integer.parseInt(args[args.length - 1]);
+		for (int i = 0; i < coins.length; i++) {
+			coins[i] = Integer.parseInt(args[i]);
+		}
+		Changer change = new Changer(coins);
+	}
+}
+```
